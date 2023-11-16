@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+        <meta charset="UTF-8">
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>WebSocker Client</title>
+        <link rel="stylesheet" href="../app_weather/style.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+        <script src="https://kit.fontawesome.com/3fabc68040.js"
+            crossorigin="anonymous"></script>
+
+    </head>
+
+    <body class="background">
+        <div>
+            <div class="container ">
+                <div class="row">
+
+                    <form class="row p-3" style="margin-left: 30%;">
+                        <div class="col-auto">
+
+                            <label for="inputPassword2" class="mt-2"
+                                style="font-size:1.2rem;font-weight:700;"> Your
+                                City</label>
+                        </div>
+                        <div class="col-auto">
+                            <label for="inputPassword2" class="visually-hidden">Password</label>
+                            <input type="text" class="form-control " id="city"
+                                placeholder="Input Your City"
+                                style="background-color:rgba(231, 216, 216, 0.1);border-bottom:2px solid black;outline:none;border-top:none;border-left:none;border-right:none">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-success mb-3"
+                                onclick="senData()">Forecast</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="output">
+
+                </div>
+                <div class="container_main" style="display: flex;">
+                    <div id="header_1" class="header-main">
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- <button onclick="contactServer">Click Here</button> -->
+
+    </body>
+
+    <script>
+
+    const senData =() =>
+    {
+       const getdataa = document.getElementById("city").value
+       const socket = new WebSocket('ws://localhost:8000');
+
+       socket.addEventListener('open', function (event) {
+   
+           socket.send(getdataa);
+   
+        });
+        socket.addEventListener('message', function (event) {
+
+            console.log("server say :",event.data);
+        
+        });
+    }
+
+   
+    fetch('./data.json')
+    .then(response => response.json())
+    .then(data => {
+        // Hiển thị dữ liệu trong div có id là "output"
+        displayData(data);
+    })
+    .catch(error => {
+        console.error('Lỗi khi đọc file JSON:', error);
+    });
+   
+
+    function displayData(data) {
+        var numeber1 = data['Nhiệt độ F']
+      
+        var outputDiv = document.getElementById("output");
+        const header = document.getElementById("header_1");
+        var temp_max_min = document.getElementById("min_max_temp")
+        var number = data['Độ C'];
+        var formattedNumber = parseFloat(number.toFixed(12));
+        var icon =data['icon1']
+        var urlVideo1 =data['few clouds']
+        var urlVideo2 =data['Beautifull_weather_video']
+        var urlVideo3 = data['overcast clouds']
+        var urlVideo4 = data['light rain']
+        var urlVideo5 = data['scattered clouds']
+        var urlVideo6 = data['clear sky']
+        var urlVideo7 = data['moderate rain']
+        var weather_status =data['mo_ta']
+         console.log(weather_status)
+        var urlVideo_main=""
+        if (weather_status === 'overcast clouds')
+        {
+            urlVideo_main =urlVideo3
+        }
+        else if (weather_status === 'few clouds')
+        {
+            urlVideo_main=urlVideo1
+        }
+        else if (weather_status === 'light rain')
+        {
+            urlVideo_main=urlVideo4
+        }
+        else if(weather_status === 'scattered clouds')
+        {
+            urlVideo_main=urlVideo5
+        }
+        else if(weather_status === 'clear sky')
+        {
+            urlVideo_main=urlVideo6
+        }
+        else if(weather_status === 'moderate rain')
+        {
+            urlVideo_main=urlVideo7
+        }
+        else
+        {
+            urlVideo_main=urlVideo2
+        }
+        var iconUrl = `http://openweathermap.org/img/w/${icon}.png`
+       
+       
+   
+        // Hiển thị mỗi thuộc tính trong đối tượng JSON
+  //  for (var key in data) {
+    //      if (data.hasOwnProperty(key)) {
+          //   outputDiv.innerHTML += "<p><strong>" + key + ":</strong> " + data[key] + "</p>";
+       //         
+       //     }
+   //   }
+
+      var longHtml ="<video  autoplay muted loop class='video-bg'>"+
+        "<source src='"+urlVideo_main+"' type='video/mp4'>"+
+
+    " </video> "+
+   "<div class='header-conten'>"+
+           "<div class='row'>" +
+                "<div class='col-md-12 location'>"+
+                   " <i class='fa-solid fa-location-dot'></i> <span>"+data['thanh_pho']+"</span>"+
+               " </div> " +
+         "  </div> " +
+          " <div class='row'> " +
+               " <div class='col-md-12'> " +
+                    "<h1 class='text-center text-light temp' >"+formattedNumber+" &deg;C</h1>" +
+                "</div>" +
+                "<div class='col-md-12 img_main'>" +
+                      "<img src='"+iconUrl+"'  class='header_img'>" +
+                       "<div class='img_conten'>" +
+                            "<h3>"+data['mo_ta']+"</h3>" +
+                            "<span class='img_conten_1'><i class='fa-solid fa-droplet' style='color:#74b9ff;'><span>"+data['do_am']+"</span></i><i class='fa-solid fa-wind' style='color:#55efc4;'><span>"+data['Tốc độ gió']+"</span> </i><i class='fa-solid fa-temperature-full' style='color:#ff7675;'><span>"+data['Nhiệt độ F ']+"&deg;F</span></i></span>"+
+                      " </div>"+
+                "</div>"+
+
+           "</div>"+
+           "<div class='row p-2 detail'>" +
+                "<div class='col-md-3'>"+
+                    "<i class='fa-solid fa-temperature-high'>Max</i>"+
+                    "<p>"+data['nhiệt độ lớn nhất ']+"&deg;C </p>"+
+                "</div>"+
+                "<div class='col-md-3'>"+
+                   " <i class='fa-solid fa-temperature-low'>Min</i>"+
+                    "<p>"+data['Nhiệt độ nhỏ nhất ']+"&deg;C</p>"+
+                "</div>"+
+                "<div class='col-md-3'>"+
+                    "<i class='fa-regular fa-sun'>Sun</i>"+
+                    "<p >"+data['Thời gian mặt trời mọc']+"</p>"+
+                "</div>"+
+                "<div class='col-md-3'>"+
+                    "<i class='fa-solid fa-moon'>Moon</i>" +
+                    "<p>"+data['Thời gian mặt trời lặng']+" </p>"+
+                "</div>"+
+           "</div>"+
+    "</div>"
+
+      header.innerHTML=longHtml
+        
+       
+      
+      
+       
+        
+   
+        
+    }
+
+    
+</script>
+
+</html>
